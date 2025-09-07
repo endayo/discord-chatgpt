@@ -1,0 +1,11 @@
+name: discord-chatgpt
+services:
+  bot:
+    build: ./build/node
+    # ポート公開は不要（Discordへ外向き接続のみ）
+    # 開発時にホットリロードしたい場合は volumes を使う:
+    volumes:
+      - ../..:/var/workspace
+    command: ["bash", "-lc", "sleep infinity"]
+volumes:
+  node_modules:
