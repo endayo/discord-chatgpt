@@ -3,8 +3,10 @@ name: discord-chatgpt-bot
 services:
   bot:
     build:
-      context: .
-      dockerfile: ./build/node/Dockerfile
+      context: ..                         # ← プロジェクトルートをコンテキストに
+      dockerfile: deploy/build/node/Dockerfile
     # 固定名にしたければ有効化
     # container_name: discord-bot
     restart: unless-stopped
+    env_file:
+      - ./.env  

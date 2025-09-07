@@ -1,21 +1,23 @@
 # 軽量 & 安定
 FROM node:20-alpine
 
-# 便利: tini でPID1問題を回避（任意）
+# PID1 問題対策（tiniを使う場合）
 RUN apk add --no-cache tini
 
-# 作業ディレクトリ
-WORKDIR /var/workspace
-# 依存のみ先に入れてキャッシュを効かせる
-COPY package.json package-lock.json* ./
-RUN npm ci --omit=dev
+# 実行ディレクトリ
+WORKDIR /app
 
-# アプリ本体
-COPY /var/workspace ../../app/src
+# 依存のみ先にインストール（キャッシュ有効化）
+# ※ ビルドコンテキストはプロジェクトルートなので "app/..." で参照
+COPY app/package.json app/package-lock.json* ./
+RUN npm ci --omit=dev || npm install --omit=dev
 
-# 実行ユーザ
+# アプリ本体をコピー
+COPY app/ ./
+
+# 実行ユーザ（任意）
 USER node
 
-# tini 経由で起動（シグナル伝播OK）
+# 起動（tini経由）
 ENTRYPOINT ["/sbin/tini","--"]
 CMD ["node","src/index.js"]
